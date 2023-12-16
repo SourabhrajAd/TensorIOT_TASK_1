@@ -1,0 +1,48 @@
+# Import necessary PySpark libraries
+from pyspark.sql.functions import col, unix_timestamp, date_format
+
+# Path to your JSON file
+json_file_path = "/home/kishor/Downloads/Video_Games.json"
+
+# Read the JSON file and create a DataFrame
+df = spark.read.json(json_file_path)
+
+# Dropping the "style" column due to inconsistent JSON syntax
+df = df.drop("style")
+
+# Convert 'reviewTime' to a timestamp and format the date as MM-DD-YYYY
+df_formatted_date = df.withColumn(
+    "formattedReviewTime",
+    date_format(unix_timestamp(col("reviewTime"), "MM dd, yyyy").cast("timestamp"), "MM-dd-yyyy")
+)
+
+# Show the DataFrame with formatted dates
+df_formatted_date.show()
+
+# Define SQL Server connection properties
+sql_server_props = {
+    "user": "your_username",
+    "password": "your_password",
+    "driver": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+    "url": "jdbc:sqlserver://your_server:your_port;databaseName=your_database",
+}
+
+# Specify the SQL Server table name
+sql_server_table = "your_table_name"
+
+# Write the DataFrame to SQL Server
+df_formatted_date.write \
+    .format("jdbc") \
+    .option("url", sql_server_props["url"]) \
+    .option("dbtable", sql_server_table) \
+    .option("user", sql_server_props["user"]) \
+    .option("password", sql_server_props["password"]) \
+    .option("driver", sql_server_props["driver"]) \
+    .mode("overwrite") \
+    .save()
+
+# Path to save the Parquet file
+parquet_file_path = "/path/to/your/output/directory"
+
+# Write the DataFrame to Parquet
+df_formatted_date.write.parquet(parquet_file_path, mode="overwrite")
