@@ -6,7 +6,7 @@ from pyspark.sql.functions import col, length, date_format, unix_timestamp
 spark = SparkSession.builder.appName("example").getOrCreate()
 
 # Path to your JSON file
-json_file_path = "/home/kishor/Downloads/test/Video_Games.json"
+json_file_path = "C:\SPARK\Video_Games.json"
 
 # Read the JSON file and create a DataFrame
 df = spark.read.json(json_file_path)
@@ -46,7 +46,7 @@ spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
 df_formatted_date.show()
 
 # Path to save the Parquet file
-parquet_file_path = "/home/kishor/Downloads/test/test1"
+parquet_file_path = "C:\SPARK\OUTPUT_FILES\test1"
 
 # Write the DataFrame to Parquet
 df_formatted_date.write.parquet(parquet_file_path, mode="overwrite")
